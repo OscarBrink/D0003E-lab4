@@ -1,8 +1,11 @@
 #include "PulseGenerator.h"
 
+uint8_t debug = 1;
 
 void flipReset(PulseGenerator *this, uint8_t arg) {
     this->reset = !(this->reset);
+    if (debug > 9) debug = 0;
+    writeChar('0' + debug++, 3);
     ASYNC(&(this->gui), &printData, getData(this, 0));
 }
 
@@ -37,10 +40,6 @@ uint8_t decrementFrequency(PulseGenerator *this, uint8_t arg) {
 }
 
 uint8_t getData(PulseGenerator *this, uint8_t arg) {
-    if (this->reset) {
-        return 0;
-    } else {
-        return this->frequency;
-    }
+    return this->reset ? 0 : this->frequency;
 }
 
