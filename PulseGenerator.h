@@ -4,7 +4,6 @@
 
 #include "GUI.h"
 
-
 typedef struct {
     Object super;
     uint8_t pin;
@@ -16,10 +15,11 @@ typedef struct {
 
 #define initPulseGenerator(pin, screenPos) { initObject(), pin, 0, 0, 0, initGUI(screenPos) }
 
-uint8_t incrementFrequency(PulseGenerator *this, uint8_t arg);
-uint8_t decrementFrequency(PulseGenerator *this, uint8_t arg);
+void incrementFrequency(PulseGenerator *this, uint8_t arg);
+void decrementFrequency(PulseGenerator *this, uint8_t arg);
 void reset(PulseGenerator *this, uint8_t arg);
-uint8_t getData(PulseGenerator *this, uint8_t arg);
+void getData(PulseGenerator *this, uint8_t arg);
 void updateGUI(PulseGenerator *this, uint8_t changeState);
-void setState(PulseGenerator *this, uint8_t state);
+void updatePulse(PulseGenerator *this, uint8_t arg);
+void schedulePulse(PulseGenerator *this, uint8_t arg);
 
