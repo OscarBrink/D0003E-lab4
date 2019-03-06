@@ -1,8 +1,11 @@
 #include "GUI.h"
 
 void flipActivationState(GUI *this, uint8_t arg) {
-    LCDDR0 ^= 0x2;
-    LCDDR3 ^= 0x1;
+    if (this->screenPos == 0) {
+        LCDDR0 ^= 0x20;
+    } else if (this->screenPos == 4) {
+        LCDDR1 ^= 0x40;
+    }
 }
 
 void printData(GUI *this, uint8_t data) {
