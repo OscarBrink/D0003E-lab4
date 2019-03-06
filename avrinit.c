@@ -2,21 +2,9 @@
 #include "avrprint.h"
 
 void initializeAVR(void) {
-    initCPU();
     initLCD();
     initIO();
     initInt();
-    //initClk();
-}
-
-
-/*
- * Initialize CPU
- */
-void initCPU(void) {
-    // Disables the CPU clock prescaler
-    CLKPR = 0x80;
-    CLKPR = 0x00;
 }
 
 
@@ -42,24 +30,6 @@ void initLCD(void) {
     // LCD Control and Status
     LCDCRA = (1<<LCDEN) // LCD Enable
         | (1<<LCDAB);   // LCD Low Power Waveform
-}
-
-
-/*
- * Initializes the 8 Mhz clock
- */
-void initClk(void) {
-    // Port B pins alternate functions
-    PORTB |= (1<<PB5); // Output Compare Match A output (Timer/counter1)
-
-    // Timer/Counter1 Control Register B
-    TCCR1B =  (1<<CS12) | (1<<CS10) // System clk with 1024 prescaler factor 
-            | (1<<WGM12);           // Clear Timer on Compare mode for OCR1A
-
-    // Set Output Compare Register A
-    //OCR1A = TCYCLES;
-
-    //TCNT1 = 0; // clear system clk
 }
 
 
