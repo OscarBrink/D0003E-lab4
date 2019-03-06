@@ -16,6 +16,8 @@ uint8_t incrementFrequency(PulseGenerator *this, uint8_t arg) {
     if ( this->frequency < 99 ) {
         this->frequency++;
         ASYNC(this, &updateGUI, 0);
+        if (this->continuousInput == 1)
+            AFTER(MSEC(100), this, &incrementFrequency, 0);
         return 1;
     }
 
@@ -27,6 +29,8 @@ uint8_t decrementFrequency(PulseGenerator *this, uint8_t arg) {
     if (this->frequency > 0)  {
         this->frequency--;
         ASYNC(this, &updateGUI, 0);
+        if (this->continuousInput == 2)
+            AFTER(MSEC(100), this, &decrementFrequency, 0);
         return 1;
     }
 

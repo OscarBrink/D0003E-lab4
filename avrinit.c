@@ -6,7 +6,7 @@ void initializeAVR(void) {
     initLCD();
     initIO();
     initInt();
-    initClk();
+    //initClk();
 }
 
 
@@ -57,9 +57,9 @@ void initClk(void) {
             | (1<<WGM12);           // Clear Timer on Compare mode for OCR1A
 
     // Set Output Compare Register A
-    OCR1A = TCYCLES;
+    //OCR1A = TCYCLES;
 
-    TCNT1 = 0; // clear system clk
+    //TCNT1 = 0; // clear system clk
 }
 
 
@@ -73,8 +73,8 @@ void initIO(void) {
           |  (1<<PB4);  // Pin Change INT12 (center input from joystick)
 
     // Port E pins alternate functions
-    PORTE |= (1<<PE3)   // Pin Change INT3 (TODO input from joystick)
-          |  (1<<PE2);  // Pin Change INT2 (TODO input from joystick)
+    PORTE |= (1<<PE3)   // Pin Change INT3 (right input from joystick)
+          |  (1<<PE2);  // Pin Change INT2 (left input from joystick)
 
     // Data Direction Register for PORT E
     DDRE |= (1<<DDE6)   // Configure PORT E Pin 6 as output
@@ -90,7 +90,7 @@ void initIO(void) {
 void initInt(void) {
 
     // Timer/Counter1 Interrupt Mask Register
-    TIMSK1 = (1<<OCIE1A);   // Output Compare A Match Interrupt Enable
+    //TIMSK1 = (1<<OCIE1A);   // Output Compare A Match Interrupt Enable
 
     // External Interrupt Mask Register
     EIMSK |= (1<<PCIE1)     // Pin Change Interrupt Enable for PCINT15..8

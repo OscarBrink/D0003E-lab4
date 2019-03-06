@@ -9,6 +9,8 @@
 
 #define MAXELEMENTS 2
 
+#define CONT_INPUT_DELAY MSEC(500)
+
 #define JOYC 7
 #define JOYU 6
 #define JOYD 5
@@ -21,14 +23,16 @@ typedef struct {
     Object super;
     PulseGenerator *elements[MAXELEMENTS];
     uint8_t activeElement;
-    uint8_t handlingInput;
     uint8_t joyStatus;
+    uint8_t continuousInputWait;
+    Msg continuousInputMsg;
 } IOHandler;
 
-#define initIOHandler(elem1, elem2) { initObject(), { elem1, elem2 }, 0, 0, 0xF8 }
+#define initIOHandler(elem1, elem2) { initObject(), { elem1, elem2 }, 0, 0xF8, 0, 0 }
 
 void joystick(IOHandler *this, int direction);
 uint8_t handleInput(IOHandler *this, int arg);
+void startContinuousInput(IOHandler *this, uint8_t direction);
 void displayInitialData(IOHandler *this, int arg);
 
 uint8_t iCtr = 0;
@@ -43,7 +47,6 @@ int main(void) {
     INSTALL(&ioHandler, &handleInput, IRQ_PCINT0);
     INSTALL(&ioHandler, &handleInput, IRQ_PCINT1);
 
-
     return TINYTIMBER(&ioHandler, &displayInitialData, 0);
 }
 
@@ -57,28 +60,41 @@ void printNum(uint8_t pos, uint8_t data) {
 
 uint8_t handleInput(IOHandler *this, int arg) {
 
-//    writeChar('0' + (PINB>>PINB4 & 1), 4);
-//    writeChar('0' + (this->joyStatus>>JOYC & 1), 5);
+    writeChar('0' + (PINB>>PINB4 & 1), 3);
+    writeChar('0' + this->elements[this->activeElement]->continuousInput, 2);
 
-//    if (debug) {
-//        debug = 0;
-//        return 1;
-//    }
+    if (this->elements[this->activeElement]->continuousInput == 1 && ((PINB>>PINB7) & 1)) { // Down
+        this->elements[this->activeElement]->continuousInput = 0;
+        return 0;
+    } else if (this->elements[this->activeElement]->continuousInput == 2 && ((PINB>>PINB6) & 1)) { // Up
+        this->elements[this->activeElement]->continuousInput = 0;
+        return 0;
+    } else if (this->elements[this->activeElement]->continuousInput) {
+        return 1;
+    } else if (this->continuousInputWait) { // continuous input scheduled
+        ABORT(this->continuousInputMsg);
+        this->continuousInputWait = 0;
+    }
 
-    if ( !(PINB & (1<<PINB7)) ) { // Down
+
+    if ( !((PINB>>PINB7) & 1) ) { // Down
         ASYNC(this->elements[this->activeElement], &decrementFrequency, 0);
-    } else if ( !(PINB & (1<<PINB6)) ) { // Up
+        this->continuousInputWait = 1;
+        this->continuousInputMsg = AFTER(CONT_INPUT_DELAY, this, &startContinuousInput, 1);
+    } else if ( !((PINB>>PINB6) & 1) ) { // Up
         ASYNC(this->elements[this->activeElement], &incrementFrequency, 0);
-    } else if ( !(PINB & (1<<PINB4)) ) { // Center
-        debug = 1;
+        this->continuousInputWait = 1;
+        this->continuousInputMsg = AFTER(CONT_INPUT_DELAY, this, &startContinuousInput, 0);
+    } else if ( !((PINB>>PINB4) & 1) ) { // Center
+        writeChar('0' + (PINB>>PINB4 & 1), 2);
         ASYNC(this->elements[this->activeElement], &reset, 0);
-    } else if ( !(PINE & (1<<PINE3)) ) { // Right
+    } else if ( !((PINE>>PINE3) & 1) ) { // Right
         //writeChar('0', 3);
         if ( (this->activeElement + 1) < MAXELEMENTS ) {
             ASYNC(this->elements[this->activeElement], &updateGUI, 1);
             ASYNC(this->elements[++this->activeElement], &updateGUI, 1);
         }
-    } else if ( !(PINE & (1<<PINE2)) ) { // Left
+    } else if ( !((PINE>>PINE2) & 1) ) { // Left
         //writeChar('1', 3);
         if ( (this->activeElement) > 0 ) {
             ASYNC(this->elements[this->activeElement], &updateGUI, 1);
@@ -90,6 +106,18 @@ uint8_t handleInput(IOHandler *this, int arg) {
     }*/
 
     return 0;
+
+}
+
+void startContinuousInput(IOHandler *this, uint8_t direction) {
+    if (direction) { // Down
+        this->elements[this->activeElement]->continuousInput = 2;
+        ASYNC(this->elements[this->activeElement], &decrementFrequency, 0);
+    } else { // Up
+        this->elements[this->activeElement]->continuousInput = 1;
+        ASYNC(this->elements[this->activeElement], &incrementFrequency, 0);
+    }
+    this->continuousInputWait = 0;
 
 }
 
