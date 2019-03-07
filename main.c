@@ -5,7 +5,7 @@
 #include "avrprint.h"
 
 //#include "GUI.h"
-#include "IOHandler.h"
+#include "InputHandler.h"
 //#include "PulseGenerator.h"
 
 
@@ -14,11 +14,11 @@ int main(void) {
     PulseGenerator pG1 = initPulseGenerator(PE6, 0);
     PulseGenerator pG2 = initPulseGenerator(PE4, 4);
 
-    IOHandler ioHandler = initIOHandler(&pG1, &pG2);
+    InputHandler inputHandler = initInputHandler(&pG1, &pG2);
 
-    INSTALL(&ioHandler, &handleInput, IRQ_PCINT0);
-    INSTALL(&ioHandler, &handleInput, IRQ_PCINT1);
+    INSTALL(&inputHandler, &handleJoystickInterrupt, IRQ_PCINT0);
+    INSTALL(&inputHandler, &handleJoystickInterrupt, IRQ_PCINT1);
 
-    return TINYTIMBER(&ioHandler, &displayInitialData, 0);
+    return TINYTIMBER(&inputHandler, &displayInitialData, 0);
 }
 

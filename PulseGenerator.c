@@ -1,6 +1,6 @@
 #include "PulseGenerator.h"
 
-#define PULSE_DELAY MSEC(500 / (this->frequency * 2)) // each step 2 hz
+#define PULSE_DELAY USEC(250000 / this->frequency) // each step 2 hz
 
 uint8_t debug = 0;
 
@@ -58,13 +58,9 @@ void updateGUI(PulseGenerator *this, uint8_t changeState) {
 void updatePulse(PulseGenerator *this, uint8_t arg) {
     if (this->frequency > 0) {
         PORTE ^= (1<<this->pin);
-        ASYNC(this, &schedulePulse, 0);
+        AFTER(PULSE_DELAY, this, &updatePulse, 0);
     } else {
         PORTE &= ~(1<<this->pin);
     }
-}
-
-void schedulePulse(PulseGenerator *this, uint8_t arg) {
-    AFTER(PULSE_DELAY, this, &updatePulse, 0);
 }
 

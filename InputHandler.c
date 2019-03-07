@@ -1,7 +1,7 @@
-#include "IOHandler.h"
+#include "InputHandler.h"
 
 
-void handleInput(IOHandler *this, int arg) {
+void handleJoystickInterrupt(InputHandler *this, int arg) {
 
     if (checkForContinuousInput(this)) return;
 
@@ -28,7 +28,7 @@ void handleInput(IOHandler *this, int arg) {
     return;
 }
 
-uint8_t checkForContinuousInput(IOHandler *this) {
+uint8_t checkForContinuousInput(InputHandler *this) {
     if (this->elements[this->activeElement]->continuousInput == 1 && ((PINB>>PINB7) & 1)) { // Down
         this->elements[this->activeElement]->continuousInput = 0;
         return 1;
@@ -44,7 +44,7 @@ uint8_t checkForContinuousInput(IOHandler *this) {
     return 0;
 }
 
-void startContinuousInput(IOHandler *this, uint8_t direction) {
+void startContinuousInput(InputHandler *this, uint8_t direction) {
     if (direction) { // Down
         this->elements[this->activeElement]->continuousInput = 2;
         ASYNC(this->elements[this->activeElement], &decrementFrequency, 0);
@@ -57,7 +57,7 @@ void startContinuousInput(IOHandler *this, uint8_t direction) {
     return;
 }
 
-void displayInitialData(IOHandler *this, uint8_t arg) {
+void displayInitialData(InputHandler *this, uint8_t arg) {
     for (int i = 0; i < MAXELEMENTS; i++) {
         ASYNC(this->elements[i], &updateGUI, 0);
     }

@@ -21,5 +21,4 @@ void reset(PulseGenerator *this, uint8_t arg);
 void getData(PulseGenerator *this, uint8_t arg);
 void updateGUI(PulseGenerator *this, uint8_t changeState);
 void updatePulse(PulseGenerator *this, uint8_t arg);
-void schedulePulse(PulseGenerator *this, uint8_t arg);
 
