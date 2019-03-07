@@ -9,11 +9,10 @@ typedef struct {
     Object super;
     PulseGenerator *elements[MAXELEMENTS];
     uint8_t activeElement;
-    uint8_t joyStatus;
     Msg continuousInputMsg;
 } InputHandler;
 
-#define initInputHandler(elem1, elem2) { initObject(), { elem1, elem2 }, 0, 0xF8, 0 }
+#define initInputHandler(elem1, elem2) { initObject(), { elem1, elem2 }, 0, 0 }
 
 // Methods
 void handleJoystickInterrupt(InputHandler *this, int arg);

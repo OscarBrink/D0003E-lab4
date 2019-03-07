@@ -57,10 +57,10 @@ void updateGUI(PulseGenerator *this, uint8_t changeState) {
 
 void updatePulse(PulseGenerator *this, uint8_t arg) {
     if (this->frequency > 0) {
-        PORTE ^= (1<<this->pin);
-        AFTER(PULSE_DELAY, this, &updatePulse, 0);
+        ASYNC(this->outputHandler, &invertPort, this->pin);
+        AFTER(PULSE_DELAY, this, &updatePulse, 0); // Schedule next pulse change
     } else {
-        PORTE &= ~(1<<this->pin);
+        ASYNC(this->outputHandler, &resetPort, this->pin);
     }
 }
 
